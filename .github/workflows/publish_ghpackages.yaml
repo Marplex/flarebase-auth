@@ -10,20 +10,19 @@ jobs:
       packages: write
     steps:
       - uses: actions/checkout@v3
-      # Setup .npmrc file to publish to GitHub Packages
       - uses: actions/setup-node@v3
         with:
           node-version: '18.x'
           registry-url: 'https://npm.pkg.github.com'
-          # Defaults to the user or organization that owns the workflow file
           scope: '@marplex'
       - name: Install dependencies
         run: npm install
       - name: Import secrets
         run: 'echo ${{ secrets.TEST_ENV }} | base64 -d > ./src/test.env.json'
-        shell: bash
       - name: Run tests
         run: npm test
+      - name: Setup github package registry
+        run: 'echo "registry=https://npm.pkg.github.com/@marplex" >> .npmrc'
       - name: Publish
         run: npm publish
         env:
