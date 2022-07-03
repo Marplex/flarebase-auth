@@ -22,7 +22,8 @@
     "transpiled",
     "typedoc",
     "untracked",
-    "flarebase"
+    "flarebase",
+    "marplex"
   ],
   "ignoreRegExpList": ["'.+?'"],
   "flagWords": [],

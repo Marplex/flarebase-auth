@@ -1,5 +1,5 @@
 {
-  "name": "flarebase-auth",
+  "name": "@marplex/flarebase-auth",
   "version": "1.0.0",
   "description": "Firebase/Admin auth SDK for Cloudflare Workers",
   "main": "build/main/index.js",
