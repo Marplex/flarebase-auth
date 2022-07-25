@@ -18,6 +18,8 @@
 - [x] verifySessionCookie()
 - [x] signInWithEmailAndPassword()
 - [x] signUpWithEmailAndPassword()
+- [x] changePassword()
+- [x] lookupUser()
 
 # Install
 
@@ -89,6 +91,20 @@ auth
   .catch((e) => console.log('Invalid session cookie'));
 ```
 
+**Cache OAuth tokens with Cloudflare KV**
+
+```ts
+import { FlarebaseAuth, CloudflareKv } from 'flarebase-auth';
+
+const auth = new FlarebaseAuth({
+  apiKey: 'Firebase api key',
+  projectId: 'Firebase project id',
+  privateKey: 'Firebase private key or service account private key',
+  serviceAccountEmail: 'Firebase service account email',
+  cache: new CloudflareKv(NAMESPACE),
+});
+```
+
 # Test environment
 
 If you want to test this library, have a look at `/src/test.env.example.json`.
@@ -113,7 +129,7 @@ run the tests with `npm test`
 
 # To-do
 
-- [ ] Add caching support (Cloudflare KV)
+- [x] Add caching support (Cloudflare KV)
 - [ ] sendEmailVerification()
 - [ ] confirmEmailVerification()
 - [ ] deleteAccount()
