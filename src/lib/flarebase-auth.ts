@@ -1,14 +1,15 @@
 import { decodeProtectedHeader, importX509, jwtVerify } from 'jose';
 
+import { Cache } from './cache/cache';
 import { getAuthToken, verifyIdToken } from './google-oauth';
-import { DecodedIdToken } from './models/token';
-import { User } from './models/user';
+import { DecodedIdToken, User } from './models';
 
 export type FlarebaseConfig = {
   readonly projectId: string;
   readonly apiKey: string;
   readonly serviceAccountEmail: string;
   readonly privateKey: string;
+  readonly cache?: Cache;
 };
 
 /**
@@ -19,6 +20,29 @@ export class FlarebaseAuth {
   private BASE_URL = 'https://identitytoolkit.googleapis.com/v1/';
 
   constructor(public readonly config: FlarebaseConfig) {}
+
+  /**
+   * Cache the result of an async function
+   * @param action Function with result to be stored
+   * @param key Where to find/store the value from/to the cache
+   * @param expiration Cache expiration in seconds
+   * @returns Cached result
+   */
+  private async withCache<T>(
+    action: () => Promise<T>,
+    key: string,
+    expiration: number
+  ): Promise<T> {
+    if (!this.config.cache) return await action();
+
+    let result = this.config.cache.get(key) as T;
+    if (!result) {
+      result = await action();
+      this.config.cache.put(key, result, { expirationTtl: expiration });
+    }
+
+    return result;
+  }
 
   /**
    * Send a post request to the identity toolkit api
@@ -49,7 +73,7 @@ export class FlarebaseAuth {
    * @param idToken A valid Firebase ID token
    * @returns User info linked to this ID token
    */
-  private async lookupUser(idToken): Promise<User> {
+  public async lookupUser(idToken): Promise<User> {
     const response = await this.sendFirebaseAuthPostRequest(
       { idToken: idToken },
       'lookup'
@@ -84,6 +108,46 @@ export class FlarebaseAuth {
     const user = await this.lookupUser(token.idToken);
 
     return { token, user };
+  }
+
+  /**
+   * Change a user's password
+   * @param idToken	A Firebase Auth ID token for the user.
+   * @param newPassword	User's new password.
+   * @returns The decoded JWT token payload
+   */
+  async changePassword(
+    idToken: string,
+    newPassword: string
+  ): Promise<DecodedIdToken> {
+    const response = await this.sendFirebaseAuthPostRequest(
+      {
+        idToken: idToken,
+        password: newPassword,
+        returnSecureToken: 'true',
+      },
+      'update'
+    );
+
+    if (response.status != 200) throw Error(await response.text());
+    const token = (await response.json()) as DecodedIdToken;
+
+    return token;
+  }
+
+  /**
+   * Delete a current user
+   * @param idToken	A Firebase Auth ID token for the user.
+   */
+  async deleteAccount(idToken: string) {
+    const response = await this.sendFirebaseAuthPostRequest(
+      {
+        idToken: idToken,
+      },
+      'delete'
+    );
+
+    if (response.status != 200) throw Error(await response.text());
   }
 
   /**
@@ -125,11 +189,16 @@ export class FlarebaseAuth {
     expiresIn: number = 60 * 60 * 24 * 14 //14 days
   ): Promise<string> {
     //Create the OAuth 2.0 token
-    //TODO: OAuth token should be cached until expiration
-    const token = await getAuthToken(
-      this.config.serviceAccountEmail,
-      this.config.privateKey,
-      'https://www.googleapis.com/auth/identitytoolkit'
+    //OAuth token is cached until expiration (1h)
+    const token = await this.withCache(
+      () =>
+        getAuthToken(
+          this.config.serviceAccountEmail,
+          this.config.privateKey,
+          'https://www.googleapis.com/auth/identitytoolkit'
+        ),
+      'google-oauth',
+      3600
     );
 
     //Post params and header authorization

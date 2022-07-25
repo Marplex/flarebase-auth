@@ -2,11 +2,13 @@ import test from 'ava';
 
 import test_config from '../test.env.json';
 
+import { TestCache } from './cache/cache-mock';
 import { FlarebaseAuth } from './flarebase-auth';
+import { sleep } from './utils';
 
 const credentials = test_config.FIREBASE_TEST_CREDENTIALS;
 const testUser = test_config.FIREBASE_TEST_USER;
-const auth = new FlarebaseAuth(credentials);
+const auth = new FlarebaseAuth({ ...credentials, cache: new TestCache() });
 
 test('should sign in with email and password', async (t) => {
   const { token } = await auth.signInWithEmailAndPassword(
@@ -15,6 +17,17 @@ test('should sign in with email and password', async (t) => {
   );
 
   t.is(token.email, testUser.email);
+});
+
+test("should change user's password", async (t) => {
+  //Sign in to get the token id
+  const { token } = await auth.signInWithEmailAndPassword(
+    testUser.email,
+    testUser.password
+  );
+
+  const decodedToken = await auth.changePassword(token.idToken, 'test123');
+  t.not(decodedToken, undefined);
 });
 
 test('should verify a valid token id', async (t) => {
@@ -28,6 +41,7 @@ test('should verify a valid token id', async (t) => {
 });
 
 test('should create session cookie from token id', async (t) => {
+  await sleep(1000);
   const { token } = await auth.signInWithEmailAndPassword(
     testUser.email,
     testUser.password
@@ -39,6 +53,7 @@ test('should create session cookie from token id', async (t) => {
 });
 
 test('should verify a valid session cookie', async (t) => {
+  await sleep(1000);
   const { token } = await auth.signInWithEmailAndPassword(
     testUser.email,
     testUser.password
