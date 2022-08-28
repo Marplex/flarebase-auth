@@ -35,10 +35,10 @@ export class FlarebaseAuth {
   ): Promise<T> {
     if (!this.config.cache) return await action();
 
-    let result = this.config.cache.get(key) as T;
+    let result = (await this.config.cache.get(key)) as T;
     if (!result) {
       result = await action();
-      this.config.cache.put(key, result, { expirationTtl: expiration });
+      await this.config.cache.put(key, result, { expirationTtl: expiration });
     }
 
     return result;

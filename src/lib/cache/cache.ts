@@ -1,5 +1,5 @@
 export interface Cache {
-  get(key: string, params?: any): any;
-  put(key: string, value: any, params?: any): any;
-  delete(key: string);
+  get(key: string, params?: any): Promise<any>;
+  put(key: string, value: any, params?: any): Promise<void>;
+  delete(key: string): Promise<void>;
 }

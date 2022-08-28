@@ -6,15 +6,15 @@ export class CloudflareKv implements Cache {
     this.namespace = namespace;
   }
 
-  get(key: string, params?: any) {
+  get(key: string, params?: any): Promise<any> {
     return this.namespace.get(key, params ?? {});
   }
 
-  put(key: string, value: any, params?: any) {
-    this.namespace.put(key, value, params ?? {});
+  put(key: string, value: any, params?: any): Promise<void> {
+    return this.namespace.put(key, value, params ?? {});
   }
 
-  delete(key: string) {
-    this.namespace.delete(key);
+  delete(key: string): Promise<void> {
+    return this.namespace.delete(key);
   }
 }

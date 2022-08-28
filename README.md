@@ -7,7 +7,7 @@
 <p align="center">
   <a href="https://github.com/marplex/flarebase-auth/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/github/license/marplex/flarebase-auth"/></a>
   <img src="https://github.com/marplex/flarebase-auth/actions/workflows/node_ci.yaml/badge.svg" alt="GitHub CI"/>
-  <a href="https://www.npmjs.com/package/@marplex/flarebase-auth"><img alt="NPM" src="https://badge.fury.io/js/flarebase-auth.svg"/></a>
+  <a href="https://www.npmjs.com/package/@marplex/flarebase-auth"><img alt="NPM" src="https://badge.fury.io/js/@marplex%2Fflarebase-auth.svg"/></a>
   <a href="https://www.npmjs.com/package/@marplex/flarebase-auth"><img src="https://img.shields.io/npm/dt/@marplex/flarebase-auth.svg" alt="NPM Downloads"/></a>
   <a href="https://github.com/Marplex"><img alt="Github" src="https://img.shields.io/static/v1?label=GitHub&message=marplex&color=005cb2"/></a>
 </p>
