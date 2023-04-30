@@ -34,7 +34,7 @@ Flarebase tries to use the same method names and return values as the official F
 **Create FlarebaseAuth**
 
 ```ts
-import { FlarebaseAuth } from 'flarebase-auth';
+import { FlarebaseAuth } from '@marplex/flarebase-auth';
 
 const auth = new FlarebaseAuth({
   apiKey: 'Firebase api key',
