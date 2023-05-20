@@ -73,7 +73,7 @@ export class FlarebaseAuth {
    * @param idToken A valid Firebase ID token
    * @returns User info linked to this ID token
    */
-  public async lookupUser(idToken): Promise<User> {
+  public async lookupUser(idToken: string): Promise<User> {
     const response = await this.sendFirebaseAuthPostRequest(
       { idToken: idToken },
       'lookup'
